@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: make-format
+        name: Run make format
+        entry: make format
+        language: system
+      - id: linter
+        name: Run make linter
+        entry: make linter
+        language: system
+      - id: test
+        name: Run make test
+        entry: make test
+        language: system
