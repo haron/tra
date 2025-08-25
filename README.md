@@ -71,7 +71,7 @@ Set environment variables for convenience:
 
 ### Options
 
-```bash
+```
 > trn --help
 usage: trn [-h] -t TO_LANGUAGE [-m MODEL] [-p PROMPT] [-v] [-d] [text ...]
 
