@@ -5,13 +5,13 @@ A CLI tool for translating text using LLMs.
 ## Features
 
 - Multiple input sources: command line arguments, stdin, clipboard, URLs, or files
-- Supports LLMs from OpenAI, Anthropic, and Google Gemini
+- OpenAI, Anthropic, and Gemini models
 - Configurable via command line arguments or environment variables
 
 ## Installation
 
-If you have [uv](https://docs.astral.sh/uv/) installed, you don't need to install the
-package—just use `uvx trn`. You can also install it normally:
+If you have [uv](https://docs.astral.sh/uv/) installed, you may skip the installation: just use
+`uvx trn`. You can also install it the usual way:
 
 ```bash
 uv tool install trn
@@ -45,17 +45,20 @@ You can also translate web pages or local PDF/image files by providing a URL or 
 # Translate from clipboard to default language
 trn
 
-# Translate command line text
+# Translate command line text into French
 trn -t french Hello world
 
 # Translate from stdin
-echo "Hello world" | trn -t german
+echo "Hello world" | trn
 
 # Translate a file
-trn -t italian document.txt
+trn document.pdf
 
 # Translate from URL
-trn -t japanese https://example.com/article
+trn https://example.com/article
+
+# Use custom LLM
+trn -m gpt-4o-mini
 ```
 
 ### Configuration
@@ -68,26 +71,29 @@ Set environment variables for convenience:
 
 ### Options
 
-- `-t, --to-language`: Target language (required)
-- `-m, --model`: LLM model to use (default: gpt-4o-mini)
-- `--prompt`: Custom translation prompt
-- `-v, --verbose`: Enable verbose output
-- `-d, --debug`: Enable debug output
-
-### Advanced Examples
-
 ```bash
-# Use different model
-trn -t spanish -m claude-3-haiku "Good morning"
+> trn --help
+usage: trn [-h] -t TO_LANGUAGE [-m MODEL] [-p PROMPT] [-v] [-d] [text ...]
 
-# Custom prompt
-trn -t french --prompt "Translate to formal French" "How are you?"
+positional arguments:
+  text                  Text to translate, or URL, or path to file (default: None)
 
-# Translate web article
-trn -t german https://news.example.com/article
+options:
+  -h, --help            show this help message and exit
+  -t, --to-language TO_LANGUAGE
+                        Target language for translation [env var: TRN_TO_LANGUAGE] (default: None)
+  -m, --model MODEL     LLM to use (run 'uvx llm models' for available models) [env var: TRN_MODEL] (default: gemini-2.5-flash)
+  -p, --prompt PROMPT   Custom prompt for translation [env var: TRN_PROMPT] (default: Translate the text (it can be in any language) into
+                        {to_language}. Don't explaint that the output is a translation. Tell me in case if you don't know about '{to_language}'
+                        language. If there is a file attached, translate the contents of the file.)
+  -v, --verbose         Enable verbose output [env var: TRN_VERBOSE] (default: False)
+  -d, --debug           Enable debug output [env var: TRN_DEBUG] (default: False)
+
+ In general, command-line values override environment variables which override defaults.
 ```
-
+ 
 ## Requirements
 
 - Python 3.12+
-- LLM API keys configured
+- LLM API key configured
+- UV installed (optional, but highly recommended)
