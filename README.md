@@ -10,7 +10,7 @@ A CLI tool for translating text using LLMs.
 
 ## Installation
 
-If you have [uv](https://docs.astral.sh/uv/) installed, you may skip the installation: just use
+With [uv](https://docs.astral.sh/uv/) installed, you may skip the installation: just use
 `uvx trn`. You can also install it the usual way:
 
 ```bash
