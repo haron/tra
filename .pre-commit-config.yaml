@@ -1,6 +1,10 @@
 repos:
   - repo: local
     hooks:
+      - id: make-readme
+        name: Run make readme
+        entry: make readme
+        language: system
       - id: make-format
         name: Run make format
         entry: make format

@@ -2,6 +2,7 @@ import logging
 import re
 import select
 import sys
+import textwrap
 from pathlib import Path
 from typing import Optional
 
@@ -11,16 +12,46 @@ import llm
 import pyperclip
 from html2text import html2text
 
-translate_prompt = "Translate the text (it can be in any language) into {to_language}. Don't explaint that the output is a translation. Tell me in case if you don't know about '{to_language}' language. If there is a file attached, translate the contents of the file. {prompt_add}"
+translate_prompt = "Translate the text (it can be in any language) into {to_language}. Don't explain that the output is a translation. Tell me if you don't recognize '{to_language}' language. If there is a file attached, translate the contents of the file. {prompt_add}"
 
 
-def translate(text: Optional[str] = None, file: Optional[str] = None, *, model: str, to_language: str, system_prompt: str, prompt_add: str):
+def translate(
+    text: Optional[str] = None,
+    file: Optional[str] = None,
+    *,
+    model: str,
+    to_language: str,
+    system_prompt: str,
+    prompt_add: str,
+    width: int = 80,
+):
     system_prompt = translate_prompt.format(to_language=to_language.capitalize(), prompt_add=prompt_add)
     attachments = [llm.Attachment(path=file)] if file else []
     logging.debug(f"{text=}, {attachments=}, {model=}, {to_language=}, {system_prompt=}")
     response = llm.get_model(model).prompt(text, attachments=attachments, system=system_prompt)
-    for chunk in response:
-        print(chunk, end="")
+    if width > 0:
+        print_wrapped(response, width=width)
+    else:
+        print("".join(list(response)))
+
+
+def print_wrapped(generator, width=80):
+    buffer = ""
+    for chunk in generator:
+        buffer += chunk
+        while True:
+            # Find last space within allowed width, prefer breaking after full words
+            if len(buffer) <= width:
+                break
+            wrap_at = buffer.rfind(" ", 0, width + 1)
+            if wrap_at == -1:  # No space found; hard-break
+                wrap_at = width
+            print(buffer[:wrap_at])
+            buffer = buffer[wrap_at:].lstrip()
+    # Print any leftover buffer (may be shorter than width)
+    if buffer:
+        for line in textwrap.wrap(buffer, width=width):
+            print(line)
 
 
 def is_url(text: str) -> bool:
@@ -77,7 +108,8 @@ def main():
         "-m", "--model", env_var="TRN_MODEL", help="LLM to use (run 'uvx llm models' for available models)", default="gemini-2.5-flash"
     )
     parser.add_argument("-p", "--prompt", env_var="TRN_PROMPT", help="Custom prompt for translation", default=translate_prompt)
-    parser.add_argument("-a", "--prompt-add", env_var="TRN_PROMPT_ADD", help="Custom prompt for translation", default="")
+    parser.add_argument("-a", "--prompt-add", env_var="TRN_PROMPT_ADD", help="Text to append to the prompt", default="")
+    parser.add_argument("-w", "--wrap", env_var="TRN_WRAP", type=int, default=80, help="Wrap output at N chars (use 0 to disable wrapping)")
     parser.add_argument("-v", "--verbose", env_var="TRN_VERBOSE", action="store_true", help="Enable verbose output")
     parser.add_argument("-d", "--debug", env_var="TRN_DEBUG", action="store_true", help="Enable debug output")
     parser.add_argument("text", nargs="*", help="Text to translate, or URL, or path to file")
@@ -89,10 +121,22 @@ def main():
     if args.debug:
         log_level = logging.DEBUG
     logging.basicConfig(level=log_level, format="%(message)s")
+
+    if not sys.stdout.isatty():
+        args.wrap = 0
+
     logging.debug(f"Started with {args=}")
 
     text, file = get_input_data(args)
-    translate(text=text, file=file, model=args.model, to_language=args.to_language, system_prompt=args.prompt, prompt_add=args.prompt_add)
+    translate(
+        text=text,
+        file=file,
+        model=args.model,
+        to_language=args.to_language,
+        system_prompt=args.prompt,
+        prompt_add=args.prompt_add,
+        width=args.wrap,
+    )
 
 
 if __name__ == "__main__":

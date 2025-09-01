@@ -19,7 +19,7 @@ init: clean githook
 	make sync
 
 githook:
-	echo -e "#!/bin/sh\nexec uv run -q pre-commit" > .git/hooks/pre-commit
+	echo -e "#!/bin/sh\nexec uv run -q pre-commit run --hook-stage manual" > .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
 
 clean:
@@ -36,3 +36,8 @@ format: sync
 
 safety:
 	uv run safety scan -o bare
+
+readme:
+	sed -i '' '/^usage: trn /,$$d' README.md
+	uv run -q --refresh --with . trn --help >> README.md
+	echo '```' >> README.md

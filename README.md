@@ -8,8 +8,9 @@
 
 ## Installation
 
-With [uv](https://docs.astral.sh/uv/) installed, you may skip the installation: `uvx trn`
-will always run the latest version of command. You can also install it the usual way:
+With [uv](https://docs.astral.sh/uv/) installed, you can run it without the installation:
+`uvx trn` will always run the latest version of the command. You can also install it the
+usual way:
 
 ```bash
 uv tool install trn
@@ -17,7 +18,7 @@ uv tool install trn
 pip install trn
 ```
 
-## Usage
+## Getting started
 
 First, [set the key](https://llm.datasette.io/en/stable/help.html#llm-keys-help) for your LLM
 provider. Example for Google Gemini:
@@ -37,7 +38,7 @@ The tool checks for arguments first, then standard input, then the clipboard.
 
 You can also translate web pages or local PDF/image files by providing a URL or file path.
 
-### Basic Usage
+## Basic Usage
 
 ```bash
 # Translate from clipboard to default language
@@ -59,7 +60,13 @@ trn https://example.com/article
 trn -m gpt-4o-mini
 ```
 
-### Configuration
+## Requirements
+
+- Python 3.12+
+- LLM API key configured
+- UV installed (optional, but highly recommended)
+
+## Configuration
 
 Set environment variables for convenience:
 
@@ -67,11 +74,12 @@ Set environment variables for convenience:
     # optionally:
     export TRN_MODEL=gpt-4o-mini
 
-### Options
+### All the options
 
 ```
 > trn --help
-usage: trn [-h] -t TO_LANGUAGE [-m MODEL] [-p PROMPT] [-a PROMPT_ADD] [-v] [-d]
+usage: trn [-h] -t TO_LANGUAGE [-m MODEL] [-p PROMPT] [-a PROMPT_ADD] [-w WRAP]
+           [-v] [-d]
            [text ...]
 
 positional arguments:
@@ -87,13 +95,15 @@ options:
                         [env var: TRN_MODEL] (default: gemini-2.5-flash)
   -p, --prompt PROMPT   Custom prompt for translation [env var: TRN_PROMPT]
                         (default: Translate the text (it can be in any language)
-                        into {to_language}. Don't explaint that the output is a
-                        translation. Tell me in case if you don't know about
+                        into {to_language}. Don't explain that the output is a
+                        translation. Tell me if you don't recognize
                         '{to_language}' language. If there is a file attached,
                         translate the contents of the file. {prompt_add})
   -a, --prompt-add PROMPT_ADD
-                        Custom prompt for translation [env var: TRN_PROMPT_ADD]
+                        Text to append to the prompt [env var: TRN_PROMPT_ADD]
                         (default: )
+  -w, --wrap WRAP       Wrap output at N chars (use 0 to disable wrapping) [env
+                        var: TRN_WRAP] (default: 80)
   -v, --verbose         Enable verbose output [env var: TRN_VERBOSE] (default:
                         False)
   -d, --debug           Enable debug output [env var: TRN_DEBUG] (default:
@@ -102,9 +112,3 @@ options:
  In general, command-line values override environment variables which override
 defaults.
 ```
-
-## Requirements
-
-- Python 3.12+
-- LLM API key configured
-- UV installed (optional, but highly recommended)
