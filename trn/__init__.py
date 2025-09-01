@@ -35,23 +35,43 @@ def translate(
         print("".join(list(response)))
 
 
+# the wrapping logic is Claude-generated, beware!
 def print_wrapped(generator, width=80):
     buffer = ""
     for chunk in generator:
         buffer += chunk
-        while True:
-            # Find last space within allowed width, prefer breaking after full words
-            if len(buffer) <= width:
-                break
+
+        # Handle newlines - they reset the line length
+        while "\n" in buffer:
+            newline_pos = buffer.find("\n")
+            line = buffer[:newline_pos]
+
+            # Wrap this line if it's too long
+            while len(line) > width:
+                wrap_at = line.rfind(" ", 0, width + 1)
+                if wrap_at == -1:
+                    wrap_at = width
+                print(line[:wrap_at])
+                line = line[wrap_at:].lstrip()
+
+            if line:
+                print(line)
+            else:
+                print()  # Empty line
+
+            buffer = buffer[newline_pos + 1 :]
+
+        # Handle remaining buffer (no newlines)
+        while len(buffer) > width:
             wrap_at = buffer.rfind(" ", 0, width + 1)
-            if wrap_at == -1:  # No space found; hard-break
+            if wrap_at == -1:
                 wrap_at = width
             print(buffer[:wrap_at])
             buffer = buffer[wrap_at:].lstrip()
-    # Print any leftover buffer (may be shorter than width)
-    if buffer:
-        for line in textwrap.wrap(buffer, width=width):
-            print(line)
+
+    # Print any remaining buffer
+    if buffer.strip():
+        print(buffer.strip())
 
 
 def is_url(text: str) -> bool:
