@@ -5,6 +5,7 @@ sync:
 	uv sync
 
 build: linter sync test
+	make clean
 	uv build
 
 publish: build
