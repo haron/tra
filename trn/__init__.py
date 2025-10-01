@@ -125,7 +125,7 @@ def main():
     parser = configargparse.ArgumentParser(formatter_class=lambda prog: configargparse.ArgumentDefaultsHelpFormatter(prog, width=80))
     parser.add_argument("-t", "--to-language", env_var="TRN_TO_LANGUAGE", required=True, help="Target language for translation")
     parser.add_argument(
-        "-m", "--model", env_var="TRN_MODEL", help="LLM to use (run 'uvx llm models' for available models)", default="gemini-2.5-flash"
+        "-m", "--model", env_var="TRN_MODEL", help="LLM to use (run 'uvx llm models' for available models)", default="gemini-flash-latest"
     )
     parser.add_argument("-p", "--prompt", env_var="TRN_PROMPT", help="Custom prompt for translation", default=translate_prompt)
     parser.add_argument("-a", "--prompt-add", env_var="TRN_PROMPT_ADD", help="Text to append to the prompt", default="")
